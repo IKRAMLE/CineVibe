@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import MovieGrid from "./MovieGrid";
@@ -22,10 +22,14 @@ const App = () => {
       />
 
       <div className="flex">
-        <Sidebar isSidebarOpen={isSidebarOpen} activeMenuItem={activeMenuItem} handleMenuClick={handleMenuClick} />
+        <Sidebar 
+          isSidebarOpen={isSidebarOpen} 
+          activeMenuItem={activeMenuItem} 
+          handleMenuClick={handleMenuClick} 
+        />
 
         <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? "ml-64" : "ml-0"}`}>
-          <MovieGrid />
+          <MovieGrid searchQuery={searchQuery} />
         </div>
       </div>
     </div>

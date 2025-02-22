@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 
 const API_URL = "https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc";
+const SEARCH_API_URL = "https://api.themoviedb.org/3/search/movie?include_adult=false&language=en-US";
+
 const API_OPTIONS = {
   method: "GET",
   headers: {
@@ -10,7 +12,7 @@ const API_OPTIONS = {
   },
 };
 
-const MovieGrid = () => {
+const MovieGrid = ({ searchQuery }) => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -18,13 +20,25 @@ const MovieGrid = () => {
   const [selectedMovie, setSelectedMovie] = useState(null);
 
   useEffect(() => {
-    fetchMovies(currentPage);
+    // Reset to first page when search query changes
+    setCurrentPage(1);
+    fetchMovies(1);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    // Only fetch for page changes when not searching
+    if (!searchQuery) {
+      fetchMovies(currentPage);
+    }
   }, [currentPage]);
 
   const fetchMovies = async (page) => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}&page=${page}`, API_OPTIONS);
+      const baseUrl = searchQuery ? SEARCH_API_URL : API_URL;
+      const searchParams = searchQuery ? `&query=${encodeURIComponent(searchQuery)}` : '';
+      const response = await fetch(`${baseUrl}&page=${page}${searchParams}`, API_OPTIONS);
+      
       if (!response.ok) throw new Error("Failed to fetch movies");
       const data = await response.json();
       setMovies(data.results || []);
@@ -50,6 +64,10 @@ const MovieGrid = () => {
         {loading ? (
           <div className="col-span-full flex justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+          </div>
+        ) : movies.length === 0 ? (
+          <div className="col-span-full text-center text-gray-400">
+            No movies found
           </div>
         ) : (
           movies.map((movie) => (
