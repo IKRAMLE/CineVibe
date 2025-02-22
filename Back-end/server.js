@@ -16,6 +16,7 @@ mongoose.connect(uri, {
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 
 // Updated schema to match frontend requirements
+
 const movieSchema = new mongoose.Schema({
   title: { type: String, required: true },
   overview: { type: String, required: true },

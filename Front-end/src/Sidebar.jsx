@@ -7,6 +7,7 @@ import {
   Heart,
   Calendar,
   ChevronDown,
+  Plus,
   LogOut
 } from 'lucide-react';
 import Ikram from "/Profile.png";
@@ -64,8 +65,8 @@ const Sidebar = ({ isSidebarOpen }) => {
     { icon: Compass, text: "Browser", path: "/" },
     { icon: TrendingUp, text: "Trending", path: "/trending" },
     { icon: User, text: "Following", path: "/following" },
-    { icon: Heart, text: "Watchlist", path: "/watchlist" },
-    { icon: Calendar, text: "Coming Soon", path: "/coming-soon" },
+    { icon: Plus, text: "Movie Add", path: "/movie-add" },
+    { icon: Heart, text: "Favorite", path: "/favorite" },
   ];
 
   const followingUsers = [

@@ -34,7 +34,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<MovieGrid searchQuery={searchQuery} />} />
               <Route path="/movie/:id" element={<MovieDetails />} />
-              <Route path="/watchlist" element={<MovieAdd />} /> 
+              <Route path="/movie-add" element={<MovieAdd />} /> 
             </Routes>
           </div>
         </div>
