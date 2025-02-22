@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Star } from "lucide-react";
+import MovieCard from "./MovieCard";
 
 const API_URL = "https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc";
 const SEARCH_API_URL = "https://api.themoviedb.org/3/search/movie?include_adult=false&language=en-US";
+const MOVIE_DETAILS_URL = "https://api.themoviedb.org/3/movie";
 
 const API_OPTIONS = {
   method: "GET",
@@ -17,38 +18,89 @@ const MovieGrid = ({ searchQuery }) => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [selectedMovie, setSelectedMovie] = useState(null);
-
-  useEffect(() => {
-    // Reset to first page when search query changes
-    setCurrentPage(1);
-    fetchMovies(1);
-  }, [searchQuery]);
-
-  useEffect(() => {
-    // Only fetch for page changes when not searching
-    if (!searchQuery) {
-      fetchMovies(currentPage);
-    }
-  }, [currentPage]);
+  const [error, setError] = useState(null);
 
   const fetchMovies = async (page) => {
     try {
       setLoading(true);
+      setError(null);
+      
       const baseUrl = searchQuery ? SEARCH_API_URL : API_URL;
       const searchParams = searchQuery ? `&query=${encodeURIComponent(searchQuery)}` : '';
       const response = await fetch(`${baseUrl}&page=${page}${searchParams}`, API_OPTIONS);
       
-      if (!response.ok) throw new Error("Failed to fetch movies");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
-      setMovies(data.results || []);
-      setTotalPages(data.total_pages);
+      
+      if (!data.results?.length) {
+        setMovies([]);
+        setTotalPages(0);
+        return;
+      }
+
+      // Fetch trailers in parallel with a timeout
+      const moviesWithTrailers = await Promise.all(
+        data.results.map(async (movie) => {
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2000); 
+
+            const trailerResponse = await fetch(
+              `${MOVIE_DETAILS_URL}/${movie.id}/videos`,
+              { ...API_OPTIONS, signal: controller.signal }
+            );
+            
+            clearTimeout(timeoutId);
+            
+            if (!trailerResponse.ok) {
+              throw new Error('Failed to fetch trailer');
+            }
+
+            const trailerData = await trailerResponse.json();
+            
+            const trailer = trailerData.results?.find(
+              video => video.type === "Trailer" && video.site === "YouTube"
+            );
+            
+            return {
+              ...movie,
+              trailer_key: trailer?.key || ''
+            };
+          } catch (err) {
+            console.warn(`Failed to fetch trailer for movie ${movie.id}:`, err);
+            return { ...movie, trailer_key: '' };
+          }
+        })
+      );
+      
+      setMovies(moviesWithTrailers);
+      setTotalPages(Math.min(data.total_pages, 47898)); 
     } catch (err) {
       console.error("Error fetching movies:", err);
+      setError("Failed to fetch movies. Please try again later.");
+      setMovies([]);
+      setTotalPages(0);
     } finally {
       setLoading(false);
     }
   };
+
+  // Reset to page 1 when search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+    fetchMovies(1);
+  }, [searchQuery]);
+
+  // Fetch movies when page changes (but only if no search query)
+  
+  useEffect(() => {
+    if (!searchQuery && currentPage > 1) {
+      fetchMovies(currentPage);
+    }
+  }, [currentPage, searchQuery]);
 
   const handlePrevPage = () => {
     setCurrentPage((prev) => Math.max(1, prev - 1));
@@ -60,6 +112,10 @@ const MovieGrid = ({ searchQuery }) => {
 
   return (
     <div className="p-6 mt-20">
+      {error && (
+        <div className="text-red-500 text-center mb-4">{error}</div>
+      )}
+      
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
         {loading ? (
           <div className="col-span-full flex justify-center">
@@ -67,68 +123,44 @@ const MovieGrid = ({ searchQuery }) => {
           </div>
         ) : movies.length === 0 ? (
           <div className="col-span-full text-center text-gray-400">
-            No movies found
+            {searchQuery ? "No movies found for your search" : "No movies available"}
           </div>
         ) : (
           movies.map((movie) => (
-            <div
-              key={movie.id}
-              className="relative group cursor-pointer"
-              onMouseEnter={() => setSelectedMovie(movie)}
-              onMouseLeave={() => setSelectedMovie(null)}
-            >
-              <img
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                alt={movie.title}
-                className="w-full h-72 object-cover rounded-lg shadow-md hover:shadow-xl transition-all duration-300"
-              />
-              {selectedMovie?.id === movie.id && (
-                <div className="absolute inset-0 bg-black/80 rounded-lg p-4 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between">
-                  <div>
-                    <h4 className="text-white font-semibold text-lg mb-2">{movie.title}</h4>
-                    <p className="text-white text-sm line-clamp-4">{movie.overview}</p>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-1">
-                      <Star className="text-yellow-400" size={16} />
-                      <span className="text-white">{movie.vote_average.toFixed(1)}</span>
-                    </div>
-                    <span className="text-white text-sm">{movie.release_date?.split("-")[0]}</span>
-                  </div>
-                </div>
-              )}
-            </div>
+            <MovieCard key={movie.id} movie={movie} />
           ))
         )}
       </div>
 
-      <div className="flex items-center justify-center space-x-4 mt-8">
-        <button
-          onClick={handlePrevPage}
-          disabled={currentPage === 1}
-          className={`px-4 py-2 rounded-full ${
-            currentPage === 1
-              ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-              : "bg-blue-600 text-white hover:bg-blue-700"
-          }`}
-        >
-          Previous
-        </button>
-        <span className="text-white">
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={handleNextPage}
-          disabled={currentPage === totalPages}
-          className={`px-4 py-2 rounded-full ${
-            currentPage === totalPages
-              ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-              : "bg-blue-600 text-white hover:bg-blue-700"
-          }`}
-        >
-          Next
-        </button>
-      </div>
+      {movies.length > 0 && (
+        <div className="flex items-center justify-center space-x-4 mt-8">
+          <button
+            onClick={handlePrevPage}
+            disabled={currentPage === 1 || loading}
+            className={`px-4 py-2 rounded-full ${
+              currentPage === 1 || loading
+                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                : "bg-blue-600 text-white hover:bg-blue-700"
+            }`}
+          >
+            Previous
+          </button>
+          <span className="text-white">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages || loading}
+            className={`px-4 py-2 rounded-full ${
+              currentPage === totalPages || loading
+                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                : "bg-blue-600 text-white hover:bg-blue-700"
+            }`}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };
