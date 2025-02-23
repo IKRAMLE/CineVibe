@@ -4,7 +4,8 @@ import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import MovieGrid from "./MovieGrid";
 import MovieDetails from "./pages/MovieDetails";
-import MovieAdd from "./pages/MovieAdd"; 
+import MovieAdd from "./pages/MovieAdd";
+import FavoriteMovies from "./pages/Favorites";
 
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -34,7 +35,8 @@ const App = () => {
             <Routes>
               <Route path="/" element={<MovieGrid searchQuery={searchQuery} />} />
               <Route path="/movie/:id" element={<MovieDetails />} />
-              <Route path="/movie-add" element={<MovieAdd />} /> 
+              <Route path="/movie-add" element={<MovieAdd />} />
+              <Route path="/favorite" element={<FavoriteMovies />} />
             </Routes>
           </div>
         </div>

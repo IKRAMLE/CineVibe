@@ -135,11 +135,11 @@ const MovieDetails = () => {
   return (
     <div className="p-6 mt-20">
       <button
-        onClick={() => navigate('/movie-add')}
+        onClick={() => navigate('/')}
         className="flex items-center space-x-2 text-blue-400 hover:text-blue-500 mb-6"
       >
         <ArrowLeft size={20} />
-        <span>Back to Added Movies</span>
+        <span>Back to Home</span>
       </button>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
