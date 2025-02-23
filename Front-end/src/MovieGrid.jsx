@@ -46,7 +46,7 @@ const MovieGrid = ({ searchQuery }) => {
         data.results.map(async (movie) => {
           try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 2000); 
+            const timeoutId = setTimeout(() => controller.abort(), 1000); 
 
             const trailerResponse = await fetch(
               `${MOVIE_DETAILS_URL}/${movie.id}/videos`,

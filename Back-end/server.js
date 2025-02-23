@@ -15,25 +15,24 @@ mongoose.connect(uri, {
   .then(() => console.log("MongoDB connected..."))
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 
-// Updated schema to match frontend requirements
-
 const movieSchema = new mongoose.Schema({
   title: { type: String, required: true },
   overview: { type: String, required: true },
   imageUrl: { type: String, required: true },
-  rating: { 
-    type: Number, 
+  rating: {
+    type: Number,
     required: true,
     min: 1,
     max: 10
   },
-  published_year: { 
-    type: Number, 
+  published_year: {
+    type: Number,
     required: true,
     min: 1900,
     max: new Date().getFullYear()
   },
-  release_date: { 
+  trailerUrl: { type: String, required: true },
+  release_date: {
     type: Date,
     default: Date.now
   }
@@ -49,9 +48,27 @@ app.get("/movies", async (req, res) => {
     const movies = await Movie.find().sort({ createdAt: -1 });
     res.json(movies);
   } catch (err) {
-    res.status(500).json({ 
+    res.status(500).json({
       message: "Error fetching movies",
-      error: err.message 
+      error: err.message
+    });
+  }
+});
+
+// Get movie by ID
+app.get("/movies/:id", async (req, res) => {
+  try {
+    const movie = await Movie.findById(req.params.id);
+    if (!movie) {
+      return res.status(404).json({
+        message: "Movie not found"
+      });
+    }
+    res.json(movie);
+  } catch (err) {
+    res.status(500).json({
+      message: "Error fetching movie",
+      error: err.message
     });
   }
 });
@@ -59,24 +76,29 @@ app.get("/movies", async (req, res) => {
 // Add a new movie
 app.post("/movies", async (req, res) => {
   try {
-    // Input validation
-    const { title, overview, imageUrl, rating, published_year } = req.body;
-    
-    if (!title || !overview || !imageUrl || !rating || !published_year) {
-      return res.status(400).json({ 
-        message: "All fields are required" 
+    const { title, overview, imageUrl, rating, published_year, trailerUrl } = req.body;
+
+    // Validate required fields
+    if (!title || !overview || !imageUrl || !rating || !published_year || !trailerUrl) {
+      return res.status(400).json({
+        message: "All fields are required"
+      });
+    }
+  
+
+    // Validate rating
+    const ratingNum = parseFloat(rating);
+    if (isNaN(ratingNum) || ratingNum < 1 || ratingNum > 10) {
+      return res.status(400).json({
+        message: "Rating must be between 1 and 10"
       });
     }
 
-    if (rating < 1 || rating > 10) {
-      return res.status(400).json({ 
-        message: "Rating must be between 1 and 10" 
-      });
-    }
-
-    if (published_year < 1900 || published_year > new Date().getFullYear()) {
-      return res.status(400).json({ 
-        message: "Invalid published year" 
+    // Validate published year
+    const yearNum = parseInt(published_year);
+    if (isNaN(yearNum) || yearNum < 1900 || yearNum > new Date().getFullYear()) {
+      return res.status(400).json({
+        message: "Invalid published year"
       });
     }
 
@@ -84,17 +106,26 @@ app.post("/movies", async (req, res) => {
       title,
       overview,
       imageUrl,
-      rating,
-      published_year,
-      release_date: new Date(published_year, 0) 
+      rating: ratingNum,
+      published_year: yearNum,
+      trailerUrl,
+      release_date: new Date(yearNum, 0)
     });
 
     const savedMovie = await newMovie.save();
     res.status(201).json(savedMovie);
   } catch (err) {
-    res.status(500).json({ 
-      message: "Error adding movie", 
-      error: err.message 
+    // Handle mongoose validation errors
+    if (err.name === 'ValidationError') {
+      return res.status(400).json({
+        message: "Validation error",
+        error: Object.values(err.errors).map(e => e.message)
+      });
+    }
+    
+    res.status(500).json({
+      message: "Error adding movie",
+      error: err.message
     });
   }
 });

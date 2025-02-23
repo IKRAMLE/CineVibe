@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { Plus, Loader2, X, Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const MoviesAdd = () => {
+  const navigate = useNavigate();
   const [movies, setMovies] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -13,6 +15,7 @@ const MoviesAdd = () => {
     imageUrl: "",
     rating: "",
     published_year: "",
+    trailerUrl: "",
   });
 
   useEffect(() => {
@@ -35,21 +38,71 @@ const MoviesAdd = () => {
   };
 
   const handleChange = (e) => {
-    setNewMovie({ ...newMovie, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    if (name === "rating") {
+      const ratingValue = parseFloat(value);
+      if (value === "" || (!isNaN(ratingValue) && ratingValue >= 0 && ratingValue <= 10)) {
+        setNewMovie({ ...newMovie, [name]: value });
+      }
+      return;
+    }
+    
+    if (name === "published_year") {
+      const yearValue = parseInt(value);
+      if (value === "" || (!isNaN(yearValue) && yearValue >= 1900 && yearValue <= new Date().getFullYear())) {
+        setNewMovie({ ...newMovie, [name]: value });
+      }
+      return;
+    }
+    
+    setNewMovie({ ...newMovie, [name]: value });
+  };
+
+  const validateForm = () => {
+    const errors = [];
+    
+    if (!newMovie.title.trim()) errors.push("Title is required");
+    if (!newMovie.overview.trim()) errors.push("Overview is required");
+    if (!newMovie.imageUrl.trim()) errors.push("Image URL is required");
+    if (!newMovie.trailerUrl.trim()) errors.push("Trailer URL is required");
+    
+    const rating = parseFloat(newMovie.rating);
+    if (isNaN(rating) || rating < 1 || rating > 10) {
+      errors.push("Rating must be between 1 and 10");
+    }
+    
+    const year = parseInt(newMovie.published_year);
+    if (isNaN(year) || year < 1900 || year > new Date().getFullYear()) {
+      errors.push(`Published year must be between 1900 and ${new Date().getFullYear()}`);
+    }
+    
+    return errors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    const errors = validateForm();
+    if (errors.length > 0) {
+      setError(errors.join(", "));
+      return;
+    }
+
     try {
       setSubmitting(true);
       setError(null);
+      
       const res = await fetch("http://localhost:5000/movies", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newMovie),
       });
 
-      if (!res.ok) throw new Error("Failed to add movie");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to add movie");
+      }
 
       const data = await res.json();
       setMovies([data, ...movies]);
@@ -60,9 +113,10 @@ const MoviesAdd = () => {
         imageUrl: "",
         rating: "",
         published_year: "",
+        trailerUrl: "",
       });
     } catch (err) {
-      setError("Failed to add movie. Please try again.");
+      setError(err.message || "Failed to add movie. Please try again.");
       console.error("Error adding movie:", err);
     } finally {
       setSubmitting(false);
@@ -84,9 +138,12 @@ const MoviesAdd = () => {
           </div>
         ) : (
           <>
-            {/* Movie Cards */}
             {movies.map((movie) => (
-              <div key={movie._id} className="relative group w-48">
+              <div 
+                key={movie._id} 
+                className="relative group w-48 cursor-pointer"
+                onClick={() => navigate(`/movie/${movie._id}`)}
+              >
                 <img
                   src={movie.imageUrl}
                   alt={movie.title}
@@ -105,22 +162,21 @@ const MoviesAdd = () => {
                       {movie.overview}
                     </p>
                   </div>
-                  <div className="flex gap-23 mt-auto">
-                    <div className="flex items-center gap-2 mb-1">
+                  <div className="flex justify-between items-center mt-auto">
+                    <div className="flex items-center gap-2">
                       <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                       <span className="text-yellow-400 font-semibold">
                         {movie.rating}
                       </span>
                     </div>
                     <p className="text-gray-300 text-sm">
-                      {movie.published_year || new Date(movie.release_date).getFullYear()}
+                      {movie.published_year}
                     </p>
                   </div>
                 </div>
               </div>
             ))}
 
-            {/* Add Movie Card */}
             <div
               onClick={() => setShowForm(true)}
               className="w-48 h-72 flex items-center justify-center border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:border-gray-400 transition-colors group"
@@ -131,7 +187,6 @@ const MoviesAdd = () => {
         )}
       </div>
 
-      {/* Modal Form */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-800 p-6 rounded-lg w-full max-w-md relative">
@@ -146,8 +201,7 @@ const MoviesAdd = () => {
               Add New Movie
             </h2>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Title */}
+            <form onSubmit={handleSubmit}>
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">
                   Title
@@ -163,7 +217,6 @@ const MoviesAdd = () => {
                 />
               </div>
 
-              {/* Overview */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">
                   Overview
@@ -178,7 +231,6 @@ const MoviesAdd = () => {
                 />
               </div>
 
-              {/* Image URL */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">
                   Image URL
@@ -194,7 +246,6 @@ const MoviesAdd = () => {
                 />
               </div>
 
-              {/* Rating */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">
                   Rating (1-10)
@@ -213,7 +264,6 @@ const MoviesAdd = () => {
                 />
               </div>
 
-              {/* Published Year */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">
                   Published Year
@@ -231,7 +281,21 @@ const MoviesAdd = () => {
                 />
               </div>
 
-              {/* Buttons */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  YouTube Trailer URL
+                </label>
+                <input
+                  type="text"
+                  name="trailerUrl"
+                  placeholder="Enter YouTube trailer URL"
+                  value={newMovie.trailerUrl}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
+                />
+              </div>
+
               <div className="flex justify-end space-x-4 pt-2">
                 <button
                   type="button"
@@ -263,5 +327,4 @@ const MoviesAdd = () => {
     </div>
   );
 };
-
 export default MoviesAdd;

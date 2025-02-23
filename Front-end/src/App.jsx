@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import MovieGrid from "./MovieGrid";
-import MovieDetails from "./MovieDetails";
+import MovieDetails from "./pages/MovieDetails";
 import MovieAdd from "./pages/MovieAdd"; 
 
 const App = () => {
