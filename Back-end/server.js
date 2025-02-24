@@ -15,6 +15,7 @@ mongoose.connect(uri, {
   .then(() => console.log("MongoDB connected..."))
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 
+// Updated movie schema with favorite field
 const movieSchema = new mongoose.Schema({
   title: { type: String, required: true },
   overview: { type: String, required: true },
@@ -35,6 +36,10 @@ const movieSchema = new mongoose.Schema({
   release_date: {
     type: Date,
     default: Date.now
+  },
+  favorite: {
+    type: Boolean,
+    default: false  // Default value is false
   }
 }, {
   timestamps: true
@@ -42,10 +47,17 @@ const movieSchema = new mongoose.Schema({
 
 const Movie = mongoose.model("Movie", movieSchema);
 
-// Get all movies - sorted by newest first
+// Get all movies or filtered by favorite status
 app.get("/movies", async (req, res) => {
   try {
-    const movies = await Movie.find().sort({ createdAt: -1 });
+    const filter = {};
+    
+    // If favorite query parameter is provided, filter by it
+    if (req.query.favorite !== undefined) {
+      filter.favorite = req.query.favorite === 'true';
+    }
+    
+    const movies = await Movie.find(filter).sort({ createdAt: -1 });
     res.json(movies);
   } catch (err) {
     res.status(500).json({
@@ -76,16 +88,15 @@ app.get("/movies/:id", async (req, res) => {
 // Add a new movie
 app.post("/movies", async (req, res) => {
   try {
-    const { title, overview, imageUrl, rating, published_year, trailerUrl } = req.body;
-
+    const { title, overview, imageUrl, rating, published_year, trailerUrl, favorite } = req.body;
+    
     // Validate required fields
     if (!title || !overview || !imageUrl || !rating || !published_year || !trailerUrl) {
       return res.status(400).json({
         message: "All fields are required"
       });
     }
-  
-
+    
     // Validate rating
     const ratingNum = parseFloat(rating);
     if (isNaN(ratingNum) || ratingNum < 1 || ratingNum > 10) {
@@ -93,7 +104,7 @@ app.post("/movies", async (req, res) => {
         message: "Rating must be between 1 and 10"
       });
     }
-
+    
     // Validate published year
     const yearNum = parseInt(published_year);
     if (isNaN(yearNum) || yearNum < 1900 || yearNum > new Date().getFullYear()) {
@@ -101,7 +112,7 @@ app.post("/movies", async (req, res) => {
         message: "Invalid published year"
       });
     }
-
+    
     const newMovie = new Movie({
       title,
       overview,
@@ -109,20 +120,12 @@ app.post("/movies", async (req, res) => {
       rating: ratingNum,
       published_year: yearNum,
       trailerUrl,
-      release_date: new Date(yearNum, 0)
+      favorite: favorite || false  // Use provided value or default to false
     });
-
+    
     const savedMovie = await newMovie.save();
     res.status(201).json(savedMovie);
   } catch (err) {
-    // Handle mongoose validation errors
-    if (err.name === 'ValidationError') {
-      return res.status(400).json({
-        message: "Validation error",
-        error: Object.values(err.errors).map(e => e.message)
-      });
-    }
-    
     res.status(500).json({
       message: "Error adding movie",
       error: err.message
@@ -130,7 +133,57 @@ app.post("/movies", async (req, res) => {
   }
 });
 
-const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+// Update a movie (necessary for toggling favorite status)
+app.patch("/movies/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+    
+    // Make sure only allowed fields are updated
+    const allowedUpdates = ['favorite', 'title', 'overview', 'imageUrl', 'rating', 'published_year', 'trailerUrl'];
+    const updateKeys = Object.keys(updates);
+    const isValidOperation = updateKeys.every(key => allowedUpdates.includes(key));
+    
+    if (!isValidOperation) {
+      return res.status(400).json({ message: 'Invalid updates' });
+    }
+    
+    const movie = await Movie.findByIdAndUpdate(
+      id, 
+      updates, 
+      { new: true, runValidators: true }
+    );
+    
+    if (!movie) {
+      return res.status(404).json({ message: 'Movie not found' });
+    }
+    
+    res.json(movie);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error updating movie",
+      error: error.message
+    });
+  }
 });
+
+// Delete a movie
+app.delete("/movies/:id", async (req, res) => {
+  try {
+    const movie = await Movie.findByIdAndDelete(req.params.id);
+    if (!movie) {
+      return res.status(404).json({
+        message: "Movie not found"
+      });
+    }
+    res.json({ message: "Movie deleted successfully" });
+  } catch (err) {
+    res.status(500).json({
+      message: "Error deleting movie",
+      error: err.message
+    });
+  }
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

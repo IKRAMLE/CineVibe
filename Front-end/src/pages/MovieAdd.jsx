@@ -5,9 +5,6 @@ import { useNavigate } from "react-router-dom";
 const MoviesAdd = () => {
   const navigate = useNavigate();
   const [movies, setMovies] = useState([]);
-  const [favorites, setFavorites] = useState(
-    new Set(JSON.parse(localStorage.getItem("favorites")) || [])
-  );
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -19,15 +16,12 @@ const MoviesAdd = () => {
     rating: "",
     published_year: "",
     trailerUrl: "",
+    favorite: false
   });
 
   useEffect(() => {
     fetchMovies();
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem("favorites", JSON.stringify([...favorites]));
-  }, [favorites]);
 
   const fetchMovies = async () => {
     try {
@@ -46,32 +40,27 @@ const MoviesAdd = () => {
 
   const toggleFavorite = async (movie) => {
     try {
-      const isFavorite = favorites.has(movie._id);
-  
-      if (isFavorite) {
-        await fetch(`http://localhost:5000/favorites/${movie._id}`, { method: "DELETE" });
-      } else {
-        await fetch("http://localhost:5000/favorites", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(movie),
-        });
-      }
-  
-      setFavorites((prev) => {
-        const newFavorites = new Set(prev);
-        if (isFavorite) {
-          newFavorites.delete(movie._id);
-        } else {
-          newFavorites.add(movie._id);
-        }
-        return newFavorites;
+      const updatedMovie = { ...movie, favorite: !movie.favorite };
+      
+      const res = await fetch(`http://localhost:5000/movies/${movie._id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ favorite: !movie.favorite }),
       });
+      
+      if (!res.ok) throw new Error("Failed to update favorite status");
+      
+      // Update local state
+      setMovies(prevMovies => 
+        prevMovies.map(m => 
+          m._id === movie._id ? { ...m, favorite: !m.favorite } : m
+        )
+      );
     } catch (error) {
-      console.error("Failed to update favorites:", error);
+      console.error("Failed to update favorite status:", error);
+      setError("Failed to update favorite status. Please try again.");
     }
   };
-  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -160,6 +149,7 @@ const MoviesAdd = () => {
         rating: "",
         published_year: "",
         trailerUrl: "",
+        favorite: false
       });
     } catch (err) {
       setError(err.message || "Failed to add movie. Please try again.");
@@ -229,7 +219,7 @@ const MoviesAdd = () => {
                 >
                   <Heart
                     className={`w-6 h-6 ${
-                      favorites.has(movie._id)
+                      movie.favorite
                         ? "text-red-500 fill-red-500"
                         : "text-gray-400"
                     }`}
