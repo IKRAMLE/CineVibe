@@ -7,7 +7,7 @@ const Favorites = ({ onFavoriteToggle }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_KEY = "16a1fa9b85ad539f358ff65639a945e9"; // Direct API key
+  const API_KEY = "16a1fa9b85ad539f358ff65639a945e9"; 
   const API_OPTIONS = {
     method: "GET",
     headers: {

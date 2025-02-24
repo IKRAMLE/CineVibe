@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
-import { Plus, Loader2, X, Star } from "lucide-react";
+import { Plus, Loader2, X, Star, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const MoviesAdd = () => {
   const navigate = useNavigate();
   const [movies, setMovies] = useState([]);
+  const [favorites, setFavorites] = useState(
+    new Set(JSON.parse(localStorage.getItem("favorites")) || [])
+  );
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -22,6 +25,10 @@ const MoviesAdd = () => {
     fetchMovies();
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem("favorites", JSON.stringify([...favorites]));
+  }, [favorites]);
+
   const fetchMovies = async () => {
     try {
       setLoading(true);
@@ -37,52 +44,91 @@ const MoviesAdd = () => {
     }
   };
 
+  const toggleFavorite = async (movie) => {
+    try {
+      const isFavorite = favorites.has(movie._id);
+  
+      if (isFavorite) {
+        await fetch(`http://localhost:5000/favorites/${movie._id}`, { method: "DELETE" });
+      } else {
+        await fetch("http://localhost:5000/favorites", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(movie),
+        });
+      }
+  
+      setFavorites((prev) => {
+        const newFavorites = new Set(prev);
+        if (isFavorite) {
+          newFavorites.delete(movie._id);
+        } else {
+          newFavorites.add(movie._id);
+        }
+        return newFavorites;
+      });
+    } catch (error) {
+      console.error("Failed to update favorites:", error);
+    }
+  };
+  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     if (name === "rating") {
       const ratingValue = parseFloat(value);
-      if (value === "" || (!isNaN(ratingValue) && ratingValue >= 0 && ratingValue <= 10)) {
+      if (
+        value === "" ||
+        (!isNaN(ratingValue) && ratingValue >= 0 && ratingValue <= 10)
+      ) {
         setNewMovie({ ...newMovie, [name]: value });
       }
       return;
     }
-    
+
     if (name === "published_year") {
       const yearValue = parseInt(value);
-      if (value === "" || (!isNaN(yearValue) && yearValue >= 1900 && yearValue <= new Date().getFullYear())) {
+      if (
+        value === "" ||
+        (!isNaN(yearValue) &&
+          yearValue >= 1900 &&
+          yearValue <= new Date().getFullYear())
+      ) {
         setNewMovie({ ...newMovie, [name]: value });
       }
       return;
     }
-    
+
     setNewMovie({ ...newMovie, [name]: value });
   };
 
   const validateForm = () => {
     const errors = [];
-    
+
     if (!newMovie.title.trim()) errors.push("Title is required");
     if (!newMovie.overview.trim()) errors.push("Overview is required");
     if (!newMovie.imageUrl.trim()) errors.push("Image URL is required");
     if (!newMovie.trailerUrl.trim()) errors.push("Trailer URL is required");
-    
+
     const rating = parseFloat(newMovie.rating);
     if (isNaN(rating) || rating < 1 || rating > 10) {
       errors.push("Rating must be between 1 and 10");
     }
-    
+
     const year = parseInt(newMovie.published_year);
     if (isNaN(year) || year < 1900 || year > new Date().getFullYear()) {
-      errors.push(`Published year must be between 1900 and ${new Date().getFullYear()}`);
+      errors.push(
+        `Published year must be between 1900 and ${new Date().getFullYear()}`
+      );
     }
-    
+
     return errors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const errors = validateForm();
     if (errors.length > 0) {
       setError(errors.join(", "));
@@ -92,7 +138,7 @@ const MoviesAdd = () => {
     try {
       setSubmitting(true);
       setError(null);
-      
+
       const res = await fetch("http://localhost:5000/movies", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -139,8 +185,8 @@ const MoviesAdd = () => {
         ) : (
           <>
             {movies.map((movie) => (
-              <div 
-                key={movie._id} 
+              <div
+                key={movie._id}
                 className="relative group w-48 cursor-pointer"
                 onClick={() => navigate(`/movie/${movie._id}`)}
               >
@@ -174,6 +220,21 @@ const MoviesAdd = () => {
                     </p>
                   </div>
                 </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFavorite(movie);
+                  }}
+                  className="absolute top-2 right-2 p-1 rounded-full bg-black/60 hover:bg-black/80 transition-colors"
+                >
+                  <Heart
+                    className={`w-6 h-6 ${
+                      favorites.has(movie._id)
+                        ? "text-red-500 fill-red-500"
+                        : "text-gray-400"
+                    }`}
+                  />
+                </button>
               </div>
             ))}
 

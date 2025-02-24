@@ -220,3 +220,5 @@ const MovieGrid = ({ searchQuery, onFavoriteToggle }) => {
 };
 
 export default MovieGrid;
+
+
