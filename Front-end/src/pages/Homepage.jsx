@@ -3,27 +3,20 @@ import axios from 'axios'
 import {Link} from 'react-router-dom'
 import { ArrowRight, ChevronRight, Play } from 'lucide-react'
 import Navbar from '../Components/Navbar';
-import Sidebar from '../Components/Sidebar';
 import Trending from '../Components/Trending';
 import Filtringbar from '../Components/Filteringbar';
 import MovieCard from '../Components/MovieCard';
 
 function HomePage() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
     <>
       {/* Transparent Navbar */}
       <Navbar
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        transparent
       />
-      {/* Sidebar */}
-      <Sidebar isSidebarOpen={isSidebarOpen} />
       <div className="relative lg:h-screen h-[90vh] w-full">
         {/* Background image */}
         <img
