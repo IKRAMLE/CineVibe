@@ -6,6 +6,7 @@ import Navbar from '../Components/Navbar';
 import Sidebar from '../Components/Sidebar';
 import Trending from '../Components/Trending';
 import Filtringbar from '../Components/Filteringbar';
+import MovieCard from '../Components/MovieCard';
 
 function HomePage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -64,6 +65,7 @@ function HomePage() {
       <Trending />
       {/* Filtering Bar Section */}
       <Filtringbar />
+      <MovieCard />
     </>
   )
 }

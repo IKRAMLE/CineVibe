@@ -51,9 +51,9 @@ const MovieCard = () => {
   };
 
   return (
-    <div className="p-6 relative -mt-37 ">
-      <div className="flex justify-between items-center">
-        <h3 className="text-2xl font-semibold text-white mb-5">Trending Movies</h3>
+    <div className="p-6 relative bg-gray-900">
+      <div className="flex justify-between items-center -mt-37">
+        <h3 className="text-2xl font-semibold text-white mb-5 ">Trending Movies</h3>
       </div>
 
       <div className="relative group">

@@ -1,34 +1,105 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Star } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
-const MovieCard = ({ movie }) => {
-  const navigate = useNavigate();
+const API_URL = "https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc";
+const API_OPTIONS = {
+  method: "GET",
+  headers: {
+    accept: "application/json",
+    Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxNmExZmE5Yjg1YWQ1MzlmMzU4ZmY2NTYzOWE5NDVlOSIsIm5iZiI6MTczOTc0MjQ5OS4wLCJzdWIiOiI2N2IyNWQyMmFhYWMzYjE2NzRlMGNkOGYiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.c9RrKf_7LTqYDxaYIAV-EDdeBlPp_4pkvv_hMomClOE`,
+  },
+};
+
+const MovieCard = () => {
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    const fetchMovies = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`${API_URL}&page=${currentPage}`, API_OPTIONS);
+        if (!response.ok) throw new Error("Failed to fetch movies");
+        const data = await response.json();
+        setMovies(data.results || []);
+      } catch (err) {
+        setMovies([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMovies();
+  }, [currentPage]);
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage(currentPage + 1);
+  };
 
   return (
-    <div
-      className="relative group cursor-pointer"
-      onClick={() => navigate(`/movie/${movie.id}`)}
-    >
-      <img
-        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-        alt={movie.title}
-        className="w-full h-72 object-cover rounded-lg shadow-md hover:shadow-xl transition-all duration-300"
-      />
-      <div className="absolute inset-0 bg-black/80 rounded-lg p-4 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between">
-        <div>
-          <h4 className="text-white font-semibold text-lg mb-2">{movie.title}</h4>
-          <p className="text-white text-sm line-clamp-4">{movie.overview}</p>
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-1">
-            <Star className="text-yellow-400" size={16} />
-            <span className="text-white">{movie.vote_average.toFixed(1)}</span>
+    <div className="bg-gray-900 -mt-8">
+      <h3 className="text-2xl font-semibold text-white px-6">Movies</h3>
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 p-6">
+        {loading ? (
+          <div className="col-span-full flex justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
           </div>
-          <span className="text-white text-sm">
-            {movie.release_date?.split("-")[0]}
-          </span>
-        </div>
+        ) : (
+          movies.map((movie) => (
+            <div key={movie.id} className="relative group cursor-pointer">
+              <img
+                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                alt={movie.title}
+                className="w-full h-72 object-cover rounded-lg shadow-md hover:shadow-xl transition-all duration-300"
+              />
+              <div className="absolute inset-0 bg-black/80 rounded-lg p-4 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between">
+                <div>
+                  <h4 className="text-white font-semibold text-lg mb-2">
+                    {movie.title}
+                  </h4>
+                  <p className="text-white text-sm line-clamp-4">
+                    {movie.overview}
+                  </p>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-1">
+                    <Star className="text-yellow-400" size={16} />
+                    <span className="text-white">
+                      {movie.vote_average.toFixed(1)}
+                    </span>
+                  </div>
+                  <span className="text-white text-sm">
+                    {movie.release_date?.split("-")[0]}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+      <div className="flex items-center justify-center space-x-4 pb-6">
+        <button
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
+          className={`px-4 py-2 rounded-full ${
+            currentPage === 1
+              ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+              : "bg-blue-600 text-white hover:bg-blue-700"
+          }`}
+        >
+          Previous
+        </button>
+        <span className="text-white">Page {currentPage}</span>
+        <button
+          onClick={handleNextPage}
+          className="px-4 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

@@ -59,7 +59,7 @@ const Filtringbar = () => {
   }, [selectedGenre]);
 
   return (
-    <div className="w-full p-4 bg-gray-900 rounded-lg shadow mb-6">
+    <div className="w-full p-4 bg-gray-900 shadow mb-6">
       <div className="flex flex-wrap gap-2 mb-4">
         {GENRES.map((genre) => (
           <button
