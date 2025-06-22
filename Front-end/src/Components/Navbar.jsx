@@ -1,11 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Bell, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import logo from "/logo.png";
 import Ikram from "/Profile.png";
 
-const Navbar = ({ isSidebarOpen, setIsSidebarOpen, searchQuery, setSearchQuery, transparent }) => {
+const Navbar = ({ isSidebarOpen, setIsSidebarOpen, searchQuery, setSearchQuery }) => {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <nav className={`flex items-center justify-between px-8 py-4 border-b border-gray-800 fixed top-0 left-0 w-full text-white p-4 shadow-md z-50 ${transparent ? 'bg-transparent' : 'bg-gray-800'}`}>
+    <nav
+      className={`lg:px-5 px-3 pt-3 pb-2 font-semibold flex justify-between items-center fixed top-0 w-full z-30 transition-all duration-300 ${
+        (window.location.pathname === "/" && !scrolled)
+          ? "bg-transparent"
+          : "bg-gray-900 shadow-md"
+      }`}
+    >
       <div className="flex items-center space-x-8">
         <div className="flex items-center">
           <div className="w-40 h-12 flex items-center justify-center">
@@ -35,7 +51,7 @@ const Navbar = ({ isSidebarOpen, setIsSidebarOpen, searchQuery, setSearchQuery, 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search movies..."
-            className="bg-gray-900 rounded-full pl-10 pr-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-gray-100 rounded-full pl-10 pr-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
         <Bell

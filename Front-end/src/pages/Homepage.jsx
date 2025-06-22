@@ -5,7 +5,7 @@ import { ArrowRight, ChevronRight, Play } from 'lucide-react'
 import Navbar from '../Components/Navbar';
 import Sidebar from '../Components/Sidebar';
 import Trending from '../Components/Trending';
-import Filtringbar from '../Components/Filtringbar';
+import Filtringbar from '../Components/Filteringbar';
 
 function HomePage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
