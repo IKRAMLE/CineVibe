@@ -6,6 +6,7 @@ import Navbar from '../Components/Navbar';
 import Trending from '../Components/Trending';
 import Filtringbar from '../Components/Filteringbar';
 import MovieCard from '../Components/MovieCard';
+import Footer from '../Components/Footer';
 
 function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -59,6 +60,7 @@ function HomePage() {
       {/* Filtering Bar Section */}
       <Filtringbar />
       <MovieCard />
+      <Footer />
     </>
   )
 }
