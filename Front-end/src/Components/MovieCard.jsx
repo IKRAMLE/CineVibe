@@ -4,6 +4,7 @@ import { FaHeart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const API_URL = "https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc";
+const SEARCH_URL = "https://api.themoviedb.org/3/search/movie?include_adult=false&language=en-US";
 const API_OPTIONS = {
   method: "GET",
   headers: {
@@ -12,7 +13,7 @@ const API_OPTIONS = {
   },
 };
 
-const MovieCard = () => {
+const MovieCard = ({ searchQuery = "" }) => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,7 +24,13 @@ const MovieCard = () => {
     const fetchMovies = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${API_URL}&page=${currentPage}`, API_OPTIONS);
+        let url = "";
+        if (searchQuery && searchQuery.trim() !== "") {
+          url = `${SEARCH_URL}&query=${encodeURIComponent(searchQuery)}&page=${currentPage}`;
+        } else {
+          url = `${API_URL}&page=${currentPage}`;
+        }
+        const response = await fetch(url, API_OPTIONS);
         if (!response.ok) throw new Error("Failed to fetch movies");
         const data = await response.json();
         setMovies(data.results || []);
@@ -36,7 +43,7 @@ const MovieCard = () => {
       }
     };
     fetchMovies();
-  }, [currentPage]);
+  }, [currentPage, searchQuery]);
 
   const handlePrevPage = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
@@ -63,12 +70,14 @@ const MovieCard = () => {
 
   return (
     <div className="bg-gray-900 -mt-8">
-      <h3 className="text-2xl font-semibold text-white px-6">Movies</h3>
+      <h3 className="text-2xl font-semibold text-white px-6">{searchQuery ? `Search Results for "${searchQuery}"` : "Movies"}</h3>
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 p-6">
         {loading ? (
           <div className="col-span-full flex justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
           </div>
+        ) : movies.length === 0 ? (
+          <div className="col-span-full text-center text-gray-400 py-12">No movies found.</div>
         ) : (
           movies.map((movie) => (
             <div
@@ -101,7 +110,7 @@ const MovieCard = () => {
                   <div className="flex items-center space-x-1">
                     <Star className="text-yellow-400" size={16} />
                     <span className="text-white">
-                      {movie.vote_average.toFixed(1)}
+                      {movie.vote_average?.toFixed(1) ?? "-"}
                     </span>
                   </div>
                   <span className="text-white text-sm">

@@ -59,7 +59,7 @@ function HomePage() {
       <Trending />
       {/* Filtering Bar Section */}
       <Filtringbar />
-      <MovieCard />
+      <MovieCard searchQuery={searchQuery} />
       <Footer />
     </>
   )
