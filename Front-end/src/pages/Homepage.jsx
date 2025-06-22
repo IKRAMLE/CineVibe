@@ -5,6 +5,7 @@ import { ArrowRight, ChevronRight, Play } from 'lucide-react'
 import Navbar from '../Components/Navbar';
 import Sidebar from '../Components/Sidebar';
 import Trending from '../Components/Trending';
+import Filtringbar from '../Components/Filtringbar';
 
 function HomePage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -31,13 +32,13 @@ function HomePage() {
         />
 
         {/* Gradient overlay on the left */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 lg:via-black/40 via-black/60 lg:to-transparent to-black/20 -z-40" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] lg:via-black/10 via-black/30 lg:to-transparent to-black/10 -z-40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 lg:via-black/40 via-black/60 lg:to-transparent to-black/20 -z-40 " />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] lg:via-black/10 via-black/30 lg:to-transparent to-black/10 -z-40 " />
 
         {/* Hero content */}
-        <div className="absolute lg:top-1/4 top-1/4 lg:left-20 left-10 lg:w-4/12 w-10/12 text-white z-10">
-          <div className="flex items-end gap-3.5">
-            <h1 className="text-7xl font-bold text-white mt-10">Lilo & Stitch</h1>
+        <div className="absolute lg:top-1/4 top-1/4 lg:left-20 left-10 lg:w-4/12 w-10/12 text-white z-10  ">
+          <div className="flex items-end gap-3.5 ">
+            <h1 className="text-7xl font-bold text-white">Lilo & Stitch</h1>
           </div>
           <p className="mt-5 font-normal">
           A tale of a young girl's close encounter with the galaxy's most wanted extraterrestrial. Lilo is a lonely Hawaiian girl who adopts a small ugly "dog," whom she names Stitch. Stitch would be the perfect pet if he weren't in reality a genetic experiment who has escaped from an alien planet and crash-landed on Earth. Through her love, faith and unwavering belief in ohana, the Hawaiian concept of family, Lilo helps unlock Stitch's heart and gives him the ability to care for someone else.      </p>
@@ -61,6 +62,8 @@ function HomePage() {
       </div>
       {/* Trending Movies Section */}
       <Trending />
+      {/* Filtering Bar Section */}
+      <Filtringbar />
     </>
   )
 }
