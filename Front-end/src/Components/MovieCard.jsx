@@ -14,6 +14,7 @@ const MovieCard = () => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -23,8 +24,10 @@ const MovieCard = () => {
         if (!response.ok) throw new Error("Failed to fetch movies");
         const data = await response.json();
         setMovies(data.results || []);
+        setTotalPages(data.total_pages || 1);
       } catch (err) {
         setMovies([]);
+        setTotalPages(1);
       } finally {
         setLoading(false);
       }
@@ -38,6 +41,21 @@ const MovieCard = () => {
 
   const handleNextPage = () => {
     setCurrentPage(currentPage + 1);
+  };
+
+  const handlePageClick = (page) => {
+    setCurrentPage(page);
+  };
+
+  // Only show up to 5 page numbers for usability
+  const getPageNumbers = () => {
+    const maxPagesToShow = 5;
+    let start = Math.max(1, currentPage - 2);
+    let end = Math.min(totalPages, start + maxPagesToShow - 1);
+    if (end - start < maxPagesToShow - 1) {
+      start = Math.max(1, end - maxPagesToShow + 1);
+    }
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   };
 
   return (
@@ -81,7 +99,7 @@ const MovieCard = () => {
           ))
         )}
       </div>
-      <div className="flex items-center justify-center space-x-4 pb-6">
+      <div className="flex items-center justify-center space-x-2 pb-6">
         <button
           onClick={handlePrevPage}
           disabled={currentPage === 1}
@@ -93,7 +111,19 @@ const MovieCard = () => {
         >
           Previous
         </button>
-        <span className="text-white">Page {currentPage}</span>
+        {getPageNumbers().map((page) => (
+          <button
+            key={page}
+            onClick={() => handlePageClick(page)}
+            className={`px-3 py-2 rounded-full font-semibold transition-colors ${
+              currentPage === page
+                ? "bg-blue-600 text-white"
+                : "bg-gray-700 text-gray-300 hover:bg-blue-500 hover:text-white"
+            }`}
+          >
+            {page}
+          </button>
+        ))}
         <button
           onClick={handleNextPage}
           className="px-4 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700"
