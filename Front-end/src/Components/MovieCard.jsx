@@ -18,6 +18,7 @@ const MovieCard = ({ searchQuery = "", selectedGenre = null }) => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [favoriteIds, setFavoriteIds] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,7 +50,21 @@ const MovieCard = ({ searchQuery = "", selectedGenre = null }) => {
       }
     };
     fetchMovies();
+    // Load favorites from localStorage
+    const stored = JSON.parse(localStorage.getItem('favoriteMovies') || '[]');
+    setFavoriteIds(stored);
   }, [currentPage, searchQuery, selectedGenre]);
+
+  const handleToggleFavorite = (movie) => {
+    let updatedFavorites = [...favoriteIds];
+    if (favoriteIds.includes(movie.id)) {
+      updatedFavorites = updatedFavorites.filter(id => id !== movie.id);
+    } else {
+      updatedFavorites.push(movie.id);
+    }
+    setFavoriteIds(updatedFavorites);
+    localStorage.setItem('favoriteMovies', JSON.stringify(updatedFavorites));
+  };
 
   const handlePrevPage = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
@@ -103,8 +118,12 @@ const MovieCard = ({ searchQuery = "", selectedGenre = null }) => {
             >
               {/* Heart icon for favorites */}
               <button
-                className="absolute top-2 right-2 z-20 text-white bg-black/60 rounded-full p-2 hover:text-red-500 hover:bg-black/80 transition-colors"
-                onClick={e => e.stopPropagation()}
+                className={`absolute top-2 right-2 z-20 bg-black/60 rounded-full p-2 transition-colors ${favoriteIds.includes(movie.id) ? 'text-red-500' : 'text-white hover:text-red-500 hover:bg-black/80'}`}
+                onClick={e => {
+                  e.stopPropagation();
+                  handleToggleFavorite(movie);
+                }}
+                aria-label={favoriteIds.includes(movie.id) ? 'Remove from favorites' : 'Add to favorites'}
               >
                 <FaHeart size={18} />
               </button>
