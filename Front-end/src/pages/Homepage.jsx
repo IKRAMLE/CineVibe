@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom'
 import { ArrowRight, ChevronRight, Play } from 'lucide-react'
 import Navbar from '../Components/Navbar';
 import Sidebar from '../Components/Sidebar';
-// import Nav from './Nav'
+import Trending from '../Components/Trending';
 
 function HomePage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -37,27 +37,30 @@ function HomePage() {
         {/* Hero content */}
         <div className="absolute lg:top-1/4 top-1/4 lg:left-20 left-10 lg:w-4/12 w-10/12 text-white z-10">
           <div className="flex items-end gap-3.5">
-            <p className="lg:text-6xl text-5xl font-bold">Lilo & Stitch</p>
+            <h1 className="text-7xl font-bold text-white mt-10">Lilo & Stitch</h1>
           </div>
           <p className="mt-5 font-normal">
           A tale of a young girl's close encounter with the galaxy's most wanted extraterrestrial. Lilo is a lonely Hawaiian girl who adopts a small ugly "dog," whom she names Stitch. Stitch would be the perfect pet if he weren't in reality a genetic experiment who has escaped from an alien planet and crash-landed on Earth. Through her love, faith and unwavering belief in ohana, the Hawaiian concept of family, Lilo helps unlock Stitch's heart and gives him the ability to care for someone else.      </p>
-          <div className="flex gap-5 mt-6">
-            <Link
+          <div className="flex space-x-4 mt-8">
+            <a
+              href="https://www.youtube.com/watch?v=9OAC55UWAQs&ab_channel=RottenTomatoesClassicTrailers"
               target="_blank"
-              to="https://www.youtube.com/watch?v=9OAC55UWAQs&ab_channel=RottenTomatoesClassicTrailers"
-              className="bg-white text-black flex items-center gap-2 rounded-full py-2 px-3 font-semibold"
+              rel="noopener noreferrer"
+              className="flex items-center space-x-2 bg-white text-black px-6 py-3 rounded-full hover:bg-gray-200 transition-colors"
             >
-              Watch Now <Play size={19} fill="black" />
-            </Link>
-            <Link
-              to={`/movie/431580`}
-              className="bg-stone-700 text-white flex justify-center items-center gap-2 rounded-full py-2 px-3 font-semibold cursor-pointer">
-              Details <ChevronRight size={21} />
-            </Link>
+              <Play size={20} className="fill-current" />
+              <span className="font-medium">Watch Now</span>
+            </a>
+            <button className="flex bg-white/10 text-white px-6 py-3 rounded-full hover:bg-white/20 transition-all backdrop-blur-md border border-white/10">
+              <span className="font-medium">Details</span>
+              <ChevronRight size={22} className="pt-1" />
+            </button>
           </div>
         </div>
-
+        
       </div>
+      {/* Trending Movies Section */}
+      <Trending />
     </>
   )
 }
