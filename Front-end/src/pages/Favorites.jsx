@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Loader2, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Navbar from '../Components/Navbar';
+import Footer from '../Components/Footer';
 
 const Favorites = () => {
   const [favorites, setFavorites] = useState([]);
@@ -218,28 +220,30 @@ const Favorites = () => {
   };
 
   return (
-    <div className="p-6 mt-20">
-      <h1 className="text-3xl font-bold text-white mb-8">My Favorites</h1>
-      
-      {error && (
-        <div className="mb-4 p-4 bg-red-500/10 border border-red-500 rounded-lg text-red-500 text-center">
-          {error}
-        </div>
-      )}
-      
-      {loading ? (
-        <div className="w-full flex justify-center items-center h-72">
-          <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
-        </div>
-      ) : favorites.length === 0 ? (
-        <div className="text-center text-gray-400 py-12">
-          No favorite movies yet. Add some movies to your favorites!
-        </div>
-      ) : (
-        <div className="flex flex-row flex-wrap gap-6">
-          {favorites.map(movie => renderMovieCard(movie))}
-        </div>
-      )}
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-blue-950 flex flex-col">
+      <Navbar searchQuery={""} setSearchQuery={() => {}} />
+      <main className="flex-1 p-6 mt-20">
+        <h1 className="text-3xl font-bold text-white mb-8">My Favorites</h1>
+        {error && (
+          <div className="mb-4 p-4 bg-red-500/10 border border-red-500 rounded-lg text-red-500 text-center">
+            {error}
+          </div>
+        )}
+        {loading ? (
+          <div className="w-full flex justify-center items-center h-72">
+            <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
+          </div>
+        ) : favorites.length === 0 ? (
+          <div className="text-center text-gray-400 py-12">
+            No favorite movies yet. Add some movies to your favorites!
+          </div>
+        ) : (
+          <div className="flex flex-row flex-wrap gap-6">
+            {favorites.map(movie => renderMovieCard(movie))}
+          </div>
+        )}
+      </main>
+      <Footer />
     </div>
   );
 };
