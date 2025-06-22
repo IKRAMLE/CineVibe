@@ -16,6 +16,7 @@ const MovieCard = () => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedMovie, setSelectedMovie] = useState(null);
+  const [favoriteIds, setFavoriteIds] = useState([]);
   const containerRef = useRef(null);
   const navigate = useNavigate();
 
@@ -33,7 +34,21 @@ const MovieCard = () => {
       }
     };
     fetchMovies();
+    // Load favorites from localStorage
+    const stored = JSON.parse(localStorage.getItem('favoriteMovies') || '[]');
+    setFavoriteIds(stored);
   }, []);
+
+  const handleToggleFavorite = (movie) => {
+    let updatedFavorites = [...favoriteIds];
+    if (favoriteIds.includes(movie.id)) {
+      updatedFavorites = updatedFavorites.filter(id => id !== movie.id);
+    } else {
+      updatedFavorites.push(movie.id);
+    }
+    setFavoriteIds(updatedFavorites);
+    localStorage.setItem('favoriteMovies', JSON.stringify(updatedFavorites));
+  };
 
   // Auto-scroll every 20 seconds
   useEffect(() => {
@@ -82,8 +97,12 @@ const MovieCard = () => {
                 onMouseLeave={() => setSelectedMovie(null)}
               >
                 <button
-                  className="absolute top-2 right-2 z-20 text-white bg-black/60 rounded-full p-2 hover:text-red-500 hover:bg-black/80 transition-colors"
-                  onClick={e => e.stopPropagation()}
+                  className={`absolute top-2 right-2 z-20 bg-black/60 rounded-full p-2 transition-colors ${favoriteIds.includes(movie.id) ? 'text-red-500' : 'text-white hover:text-red-500 hover:bg-black/80'}`}
+                  onClick={e => {
+                    e.stopPropagation();
+                    handleToggleFavorite(movie);
+                  }}
+                  aria-label={favoriteIds.includes(movie.id) ? 'Remove from favorites' : 'Add to favorites'}
                 >
                   <FaHeart size={18} />
                 </button>
