@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Star } from "lucide-react";
+import { FaHeart } from "react-icons/fa";
 
 const API_URL = "https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc";
 const API_OPTIONS = {
@@ -69,6 +70,9 @@ const MovieCard = () => {
         ) : (
           movies.map((movie) => (
             <div key={movie.id} className="relative group cursor-pointer">
+              <button className="absolute top-2 right-2 z-20 text-white bg-black/60 rounded-full p-2 hover:text-red-500 hover:bg-black/80 transition-colors">
+                <FaHeart size={18} />
+              </button>
               <img
                 src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                 alt={movie.title}
