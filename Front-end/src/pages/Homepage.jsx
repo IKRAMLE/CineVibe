@@ -10,6 +10,7 @@ import Footer from '../Components/Footer';
 
 function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedGenre, setSelectedGenre] = useState(null);
 
   return (
     <>
@@ -58,8 +59,8 @@ function HomePage() {
       {/* Trending Movies Section */}
       <Trending />
       {/* Filtering Bar Section */}
-      <Filtringbar />
-      <MovieCard searchQuery={searchQuery} />
+      <Filtringbar selectedGenre={selectedGenre} setSelectedGenre={setSelectedGenre} />
+      <MovieCard searchQuery={searchQuery} selectedGenre={selectedGenre} />
       <Footer />
     </>
   )

@@ -13,7 +13,7 @@ const API_OPTIONS = {
   },
 };
 
-const MovieCard = ({ searchQuery = "" }) => {
+const MovieCard = ({ searchQuery = "", selectedGenre = null }) => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,8 +27,14 @@ const MovieCard = ({ searchQuery = "" }) => {
         let url = "";
         if (searchQuery && searchQuery.trim() !== "") {
           url = `${SEARCH_URL}&query=${encodeURIComponent(searchQuery)}&page=${currentPage}`;
+          if (selectedGenre) {
+            url += `&with_genres=${selectedGenre}`;
+          }
         } else {
           url = `${API_URL}&page=${currentPage}`;
+          if (selectedGenre) {
+            url += `&with_genres=${selectedGenre}`;
+          }
         }
         const response = await fetch(url, API_OPTIONS);
         if (!response.ok) throw new Error("Failed to fetch movies");
@@ -43,7 +49,7 @@ const MovieCard = ({ searchQuery = "" }) => {
       }
     };
     fetchMovies();
-  }, [currentPage, searchQuery]);
+  }, [currentPage, searchQuery, selectedGenre]);
 
   const handlePrevPage = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
@@ -68,9 +74,19 @@ const MovieCard = ({ searchQuery = "" }) => {
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   };
 
+  let title = "Movies";
+  if (searchQuery) {
+    title = `Search Results for "${searchQuery}"`;
+  } else if (selectedGenre) {
+    const genreName = {
+      28: "Action", 12: "Adventure", 16: "Animation", 35: "Comedy", 80: "Crime", 99: "Documentary", 18: "Drama", 10751: "Family", 14: "Fantasy", 36: "History", 27: "Horror", 10402: "Music", 9648: "Mystery", 10749: "Romance", 878: "Science Fiction", 10770: "TV Movie", 53: "Thriller", 10752: "War", 37: "Western"
+    }[selectedGenre];
+    title = genreName ? `${genreName} Movies` : title;
+  }
+
   return (
     <div className="bg-gray-900 -mt-8">
-      <h3 className="text-2xl font-semibold text-white px-6">{searchQuery ? `Search Results for "${searchQuery}"` : "Movies"}</h3>
+      <h3 className="text-2xl font-semibold text-white px-6">{title}</h3>
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 p-6">
         {loading ? (
           <div className="col-span-full flex justify-center">

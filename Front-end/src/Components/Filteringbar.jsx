@@ -1,13 +1,4 @@
-import React, { useState, useEffect } from "react";
-
-const API_URL = "https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc";
-const API_OPTIONS = {
-  method: "GET",
-  headers: {
-    accept: "application/json",
-    Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxNmExZmE5Yjg1YWQ1MzlmMzU4ZmY2NTYzOWE5NDVlOSIsIm5iZiI6MTczOTc0MjQ5OS4wLCJzdWIiOiI2N2IyNWQyMmFhYWMzYjE2NzRlMGNkOGYiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.c9RrKf_7LTqYDxaYIAV-EDdeBlPp_4pkvv_hMomClOE`,
-  },
-};
+import React from "react";
 
 const GENRES = [
   { id: null, name: "All Popular" },
@@ -32,32 +23,7 @@ const GENRES = [
   { id: 37, name: "Western" },
 ];
 
-const Filtringbar = () => {
-  const [selectedGenre, setSelectedGenre] = useState(null);
-  const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const fetchMovies = async () => {
-      setLoading(true);
-      let url = API_URL;
-      if (selectedGenre) {
-        url += `&with_genres=${selectedGenre}`;
-      }
-      try {
-        const response = await fetch(url, API_OPTIONS);
-        if (!response.ok) throw new Error("Failed to fetch movies");
-        const data = await response.json();
-        setMovies(data.results || []);
-      } catch (err) {
-        setMovies([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchMovies();
-  }, [selectedGenre]);
-
+const Filtringbar = ({ selectedGenre, setSelectedGenre }) => {
   return (
     <div className="w-full p-4 bg-gray-900 shadow mb-6">
       <div className="flex flex-wrap gap-2 mb-4">
