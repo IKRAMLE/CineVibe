@@ -33,7 +33,7 @@ const Navbar = ({ searchQuery, setSearchQuery }) => {
       <div className="flex items-center space-x-8">
         <div className="flex space-x-6">
           <Link to="/" className="hover:text-blue-400 transition-colors text-white font-poppins text-xl">Home</Link>
-          <Link to="/my-list" className="hover:text-blue-400 transition-colors text-white font-poppins text-xl">My List</Link>
+          <Link to="/movie-add" className="hover:text-blue-400 transition-colors text-white font-poppins text-xl">My List</Link>
           <Link to="/favorites" className="hover:text-blue-400 transition-colors text-white font-poppins text-xl">Favorites</Link>
           <Link to="/contact" className="hover:text-blue-400 transition-colors text-white font-poppins text-xl">Contact</Link>
         </div>

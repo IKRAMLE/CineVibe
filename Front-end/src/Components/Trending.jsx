@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { ChevronRight, ChevronLeft, Star } from "lucide-react";
 import { FaHeart } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const API_URL = "https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc";
 const API_OPTIONS = {
@@ -16,6 +17,7 @@ const MovieCard = () => {
   const [loading, setLoading] = useState(true);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const containerRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -75,10 +77,14 @@ const MovieCard = () => {
               <div
                 key={movie.id}
                 className="flex-shrink-0 relative group cursor-pointer"
+                onClick={() => navigate(`/movie/${movie.id}`)}
                 onMouseEnter={() => setSelectedMovie(movie)}
                 onMouseLeave={() => setSelectedMovie(null)}
               >
-                <button className="absolute top-2 right-2 z-20 text-white bg-black/60 rounded-full p-2 hover:text-red-500 hover:bg-black/80 transition-colors">
+                <button
+                  className="absolute top-2 right-2 z-20 text-white bg-black/60 rounded-full p-2 hover:text-red-500 hover:bg-black/80 transition-colors"
+                  onClick={e => e.stopPropagation()}
+                >
                   <FaHeart size={18} />
                 </button>
                 <img
