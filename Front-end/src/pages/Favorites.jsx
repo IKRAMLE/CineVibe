@@ -167,7 +167,7 @@ const Favorites = () => {
     return (
       <div 
         key={movie.id || movie._id}
-        className="relative group w-48 cursor-pointer"
+        className="relative group w-36 xs:w-44 sm:w-48 cursor-pointer"
         onClick={() => {
           // Handle different navigation paths based on source
           if (movie.source === 'db') {
@@ -180,28 +180,28 @@ const Favorites = () => {
         <img
           src={movie.imageUrl || "/api/placeholder/192/288"}
           alt={movie.title}
-          className="w-48 h-72 object-cover rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+          className="w-36 xs:w-44 sm:w-48 h-56 xs:h-64 sm:h-72 object-cover rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
           onError={(e) => {
             e.target.src = "/api/placeholder/192/288";
             e.target.onerror = null;
           }}
         />
-        <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex flex-col justify-between p-4">
+        <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex flex-col justify-between p-2 xs:p-3 sm:p-4">
           <div>
-            <h3 className="text-white font-semibold text-lg mb-2">
+            <h3 className="text-white font-semibold text-base xs:text-lg mb-1 xs:mb-2">
               {movie.title}
             </h3>
-            <p className="text-gray-300 text-sm line-clamp-4">
+            <p className="text-gray-300 text-xs xs:text-sm line-clamp-4">
               {movie.overview}
             </p>
           </div>
           <div className="flex justify-between items-center mt-auto">
             <div className="flex items-center gap-2">
-              <span className="text-yellow-400 font-semibold">
+              <span className="text-yellow-400 font-semibold text-xs xs:text-sm">
                 {movie.rating}
               </span>
             </div>
-            <p className="text-gray-300 text-sm">
+            <p className="text-gray-300 text-xs xs:text-sm">
               {movie.published_year}
             </p>
           </div>
@@ -213,7 +213,7 @@ const Favorites = () => {
           }}
           className="absolute top-2 right-2 p-1 rounded-full bg-black/60 hover:bg-black/80 transition-colors"
         >
-          <Heart className="w-6 h-6 text-red-500 fill-red-500" />
+          <Heart className="w-5 xs:w-6 h-5 xs:h-6 text-red-500 fill-red-500" />
         </button>
       </div>
     );
@@ -223,7 +223,7 @@ const Favorites = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-blue-950 flex flex-col">
       <Navbar searchQuery={""} setSearchQuery={() => {}} />
       <main className="flex-1 p-6 mt-20">
-        <h1 className="text-3xl font-bold text-white mb-8">My Favorites</h1>
+        <h1 className="text-2xl xs:text-3xl font-bold text-white mb-6 xs:mb-8">My Favorites</h1>
         {error && (
           <div className="mb-4 p-4 bg-red-500/10 border border-red-500 rounded-lg text-red-500 text-center">
             {error}
@@ -238,7 +238,7 @@ const Favorites = () => {
             No favorite movies yet. Add some movies to your favorites!
           </div>
         ) : (
-          <div className="flex flex-row flex-wrap gap-6">
+          <div className="flex flex-wrap gap-4 sm:gap-6 justify-center">
             {favorites.map(movie => renderMovieCard(movie))}
           </div>
         )}
