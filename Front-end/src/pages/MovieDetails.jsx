@@ -128,7 +128,7 @@ const MovieDetails = () => {
           </button>
         </div>
       ) : !movie ? null : (
-        <div className="p-6 mt-17 bg-gray-900 min-h-screen">
+        <div className="p-6 mt-14 sm:mt-17 bg-gray-900 min-h-screen">
           <button
             onClick={() => navigate('/')}
             className="flex items-center space-x-2 text-blue-400 hover:text-blue-500 mb-6"
