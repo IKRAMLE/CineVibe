@@ -5,6 +5,6 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [tailwindcss(), react()],
   server: {
-    historyApiFallback: true, // Allows SPA routing in dev
+    historyApiFallback: true, 
   },
 })

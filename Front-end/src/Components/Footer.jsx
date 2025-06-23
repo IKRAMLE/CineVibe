@@ -81,7 +81,7 @@ const Footer = () => {
       {/* Decorative divider */}
       <div className="mt-8 border-t border-gray-700 opacity-60" />
       <div className="text-center text-xs text-gray-500 mt-4 z-10 relative">
-        &copy; {new Date().getFullYear()} CineVibe. All rights reserved. | Made with <span className="text-blue-400">&#10084;</span> by CineVibe Team
+        &copy; {new Date().getFullYear()} CineVibe. All rights reserved. | Made with <span className="text-blue-400">&#10084;</span> by Ikram
       </div>
     </footer>
   );
