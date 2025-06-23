@@ -178,7 +178,7 @@ const Favorites = () => {
         }}
       >
         <img
-          src={movie.imageUrl || "/api/placeholder/192/288"}
+          src={movie.source === 'db' ? `http://localhost:5000/uploads/${movie.imagePath}` : (movie.imageUrl || "/api/placeholder/192/288")}
           alt={movie.title}
           className="w-36 xs:w-44 sm:w-48 h-56 xs:h-64 sm:h-72 object-cover rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
           onError={(e) => {

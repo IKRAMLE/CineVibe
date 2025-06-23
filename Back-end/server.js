@@ -1,10 +1,51 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Configure Multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    // Generate unique filename with timestamp
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  // Accept only image files
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only image files are allowed!'), false);
+  }
+};
+
+const upload = multer({ 
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
 
 const uri = "mongodb+srv://ikramlechqer:ikramlechqer@cluster0.owgf0.mongodb.net/Movie?retryWrites=true&w=majority";
 
@@ -15,11 +56,11 @@ mongoose.connect(uri, {
   .then(() => console.log("MongoDB connected..."))
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 
-// Updated movie schema with favorite field
+// Updated movie schema with imagePath instead of imageUrl
 const movieSchema = new mongoose.Schema({
   title: { type: String, required: true },
   overview: { type: String, required: true },
-  imageUrl: { type: String, required: true },
+  imagePath: { type: String, required: true }, // Changed from imageUrl to imagePath
   rating: {
     type: Number,
     required: true,
@@ -39,7 +80,7 @@ const movieSchema = new mongoose.Schema({
   },
   favorite: {
     type: Boolean,
-    default: false  // Default value is false
+    default: false
   }
 }, {
   timestamps: true
@@ -85,13 +126,20 @@ app.get("/movies/:id", async (req, res) => {
   }
 });
 
-// Add a new movie
-app.post("/movies", async (req, res) => {
+// Add a new movie with file upload
+app.post("/movies", upload.single('image'), async (req, res) => {
   try {
-    const { title, overview, imageUrl, rating, published_year, trailerUrl, favorite } = req.body;
+    const { title, overview, rating, published_year, trailerUrl, favorite } = req.body;
+    
+    // Check if image file was uploaded
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Image file is required"
+      });
+    }
     
     // Validate required fields
-    if (!title || !overview || !imageUrl || !rating || !published_year || !trailerUrl) {
+    if (!title || !overview || !rating || !published_year || !trailerUrl) {
       return res.status(400).json({
         message: "All fields are required"
       });
@@ -116,11 +164,11 @@ app.post("/movies", async (req, res) => {
     const newMovie = new Movie({
       title,
       overview,
-      imageUrl,
+      imagePath: req.file.filename, // Store the filename
       rating: ratingNum,
       published_year: yearNum,
       trailerUrl,
-      favorite: favorite || false  // Use provided value or default to false
+      favorite: favorite || false
     });
     
     const savedMovie = await newMovie.save();
@@ -140,7 +188,7 @@ app.patch("/movies/:id", async (req, res) => {
     const updates = req.body;
     
     // Make sure only allowed fields are updated
-    const allowedUpdates = ['favorite', 'title', 'overview', 'imageUrl', 'rating', 'published_year', 'trailerUrl'];
+    const allowedUpdates = ['favorite', 'title', 'overview', 'rating', 'published_year', 'trailerUrl'];
     const updateKeys = Object.keys(updates);
     const isValidOperation = updateKeys.every(key => allowedUpdates.includes(key));
     
@@ -170,12 +218,22 @@ app.patch("/movies/:id", async (req, res) => {
 // Delete a movie
 app.delete("/movies/:id", async (req, res) => {
   try {
-    const movie = await Movie.findByIdAndDelete(req.params.id);
+    const movie = await Movie.findById(req.params.id);
     if (!movie) {
       return res.status(404).json({
         message: "Movie not found"
       });
     }
+    
+    // Delete the image file if it exists
+    if (movie.imagePath) {
+      const imagePath = path.join(__dirname, 'uploads', movie.imagePath);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+    }
+    
+    await Movie.findByIdAndDelete(req.params.id);
     res.json({ message: "Movie deleted successfully" });
   } catch (err) {
     res.status(500).json({

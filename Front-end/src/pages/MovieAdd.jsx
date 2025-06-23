@@ -56,20 +56,27 @@ const MoviesAdd = () => {
     }
   };
 
-  const validateForm = (newMovie) => {
+  const validateForm = (formData) => {
     const errors = [];
 
-    if (!newMovie.title.trim()) errors.push("Title is required");
-    if (!newMovie.overview.trim()) errors.push("Overview is required");
-    if (!newMovie.imageUrl.trim()) errors.push("Image URL is required");
-    if (!newMovie.trailerUrl.trim()) errors.push("Trailer URL is required");
+    const title = formData.get('title');
+    const overview = formData.get('overview');
+    const image = formData.get('image');
+    const trailerUrl = formData.get('trailerUrl');
+    const rating = formData.get('rating');
+    const published_year = formData.get('published_year');
 
-    const rating = parseFloat(newMovie.rating);
-    if (isNaN(rating) || rating < 1 || rating > 10) {
+    if (!title || !title.trim()) errors.push("Title is required");
+    if (!overview || !overview.trim()) errors.push("Overview is required");
+    if (!image) errors.push("Image file is required");
+    if (!trailerUrl || !trailerUrl.trim()) errors.push("Trailer URL is required");
+
+    const ratingNum = parseFloat(rating);
+    if (isNaN(ratingNum) || ratingNum < 1 || ratingNum > 10) {
       errors.push("Rating must be between 1 and 10");
     }
 
-    const year = parseInt(newMovie.published_year);
+    const year = parseInt(published_year);
     if (isNaN(year) || year < 1900 || year > new Date().getFullYear()) {
       errors.push(
         `Published year must be between 1900 and ${new Date().getFullYear()}`
@@ -79,8 +86,8 @@ const MoviesAdd = () => {
     return errors;
   };
 
-  const handleSubmit = async (newMovie) => {
-    const errors = validateForm(newMovie);
+  const handleSubmit = async (formData) => {
+    const errors = validateForm(formData);
     if (errors.length > 0) {
       setError(errors.join(", "));
       return;
@@ -92,8 +99,7 @@ const MoviesAdd = () => {
 
       const res = await fetch("http://localhost:5000/movies", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newMovie),
+        body: formData, // Send FormData instead of JSON
       });
 
       if (!res.ok) {
@@ -135,7 +141,7 @@ const MoviesAdd = () => {
                   onClick={() => navigate(`/movie/${movie._id}`)}
                 >
                   <img
-                    src={movie.imageUrl}
+                    src={`http://localhost:5000/uploads/${movie.imagePath}`}
                     alt={movie.title}
                     className="w-36 xs:w-44 sm:w-48 h-56 xs:h-64 sm:h-72 object-cover rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
                     onError={(e) => {
