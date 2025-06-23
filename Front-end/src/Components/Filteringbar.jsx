@@ -25,18 +25,27 @@ const GENRES = [
 
 const Filtringbar = ({ selectedGenre, setSelectedGenre }) => {
   return (
-    <div className="w-full p-4 bg-gray-900 shadow mb-6">
-      <div className="flex flex-wrap gap-2 mb-4">
+    <div className="w-full px-1 sm:px-4 py-3 sm:py-4 bg-gray-900 shadow mb-4 sm:mb-6">
+      <div className="flex flex-nowrap sm:flex-wrap gap-2 mb-2 sm:mb-4 overflow-x-auto scrollbar-hide">
         {GENRES.map((genre) => (
           <button
             key={genre.id ?? 'all'}
             onClick={() => setSelectedGenre(genre.id)}
-            className={`px-4 py-2 rounded-full font-medium transition-colors ${selectedGenre === genre.id ? 'bg-blue-500 text-white' : 'bg-gray-800 text-gray-200 hover:bg-blue-600 hover:text-white'}`}
+            className={`px-3 sm:px-4 py-2 rounded-full font-medium transition-colors whitespace-nowrap text-sm sm:text-base ${selectedGenre === genre.id ? 'bg-blue-500 text-white' : 'bg-gray-800 text-gray-200 hover:bg-blue-600 hover:text-white'}`}
           >
             {genre.name}
           </button>
         ))}
       </div>
+      <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 };

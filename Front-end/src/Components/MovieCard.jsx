@@ -101,8 +101,8 @@ const MovieCard = ({ searchQuery = "", selectedGenre = null }) => {
 
   return (
     <div className="bg-gray-900 -mt-8">
-      <h3 className="text-2xl font-semibold text-white px-6">{title}</h3>
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 p-6">
+      <h3 className="text-lg sm:text-2xl font-semibold text-white px-3 sm:px-6">{title}</h3>
+      <div className="grid grid-cols-2 xs:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-6 p-2 sm:p-6">
         {loading ? (
           <div className="col-span-full flex justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
@@ -118,7 +118,7 @@ const MovieCard = ({ searchQuery = "", selectedGenre = null }) => {
             >
               {/* Heart icon for favorites */}
               <button
-                className={`absolute top-2 right-2 z-20 bg-black/60 rounded-full p-2 transition-colors ${favoriteIds.includes(movie.id) ? 'text-red-500' : 'text-white hover:text-red-500 hover:bg-black/80'}`}
+                className={`absolute top-1.5 right-1.5 z-20 bg-black/60 rounded-full p-2 transition-colors ${favoriteIds.includes(movie.id) ? 'text-red-500' : 'text-white hover:text-red-500 hover:bg-black/80'}`}
                 onClick={e => {
                   e.stopPropagation();
                   handleToggleFavorite(movie);
@@ -130,25 +130,25 @@ const MovieCard = ({ searchQuery = "", selectedGenre = null }) => {
               <img
                 src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                 alt={movie.title}
-                className="w-full h-72 object-cover rounded-lg shadow-md hover:shadow-xl transition-all duration-300"
+                className="w-full h-48 xs:h-56 sm:h-64 md:h-72 object-cover rounded-lg shadow-md hover:shadow-xl transition-all duration-300"
               />
-              <div className="absolute inset-0 bg-black/80 rounded-lg p-4 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between">
+              <div className="hidden xs:flex absolute inset-0 bg-black/80 rounded-lg p-2 sm:p-4 opacity-0 group-hover:opacity-100 transition-opacity flex-col justify-between pointer-events-none">
                 <div>
-                  <h4 className="text-white font-semibold text-lg mb-2">
+                  <h4 className="text-white font-semibold text-base sm:text-lg mb-1 sm:mb-2">
                     {movie.title}
                   </h4>
-                  <p className="text-white text-sm line-clamp-4">
+                  <p className="text-white text-xs sm:text-sm line-clamp-4">
                     {movie.overview}
                   </p>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mt-2">
                   <div className="flex items-center space-x-1">
                     <Star className="text-yellow-400" size={16} />
-                    <span className="text-white">
+                    <span className="text-white text-xs sm:text-base">
                       {movie.vote_average?.toFixed(1) ?? "-"}
                     </span>
                   </div>
-                  <span className="text-white text-sm">
+                  <span className="text-white text-xs sm:text-sm">
                     {movie.release_date?.split("-")[0]}
                   </span>
                 </div>
@@ -161,7 +161,7 @@ const MovieCard = ({ searchQuery = "", selectedGenre = null }) => {
         <button
           onClick={handlePrevPage}
           disabled={currentPage === 1}
-          className={`px-4 py-2 rounded-full ${
+          className={`px-3 sm:px-4 py-2 rounded-full text-sm sm:text-base ${
             currentPage === 1
               ? "bg-gray-700 text-gray-500 cursor-not-allowed"
               : "bg-blue-600 text-white hover:bg-blue-700"
@@ -173,7 +173,7 @@ const MovieCard = ({ searchQuery = "", selectedGenre = null }) => {
           <button
             key={page}
             onClick={() => handlePageClick(page)}
-            className={`px-3 py-2 rounded-full font-semibold transition-colors ${
+            className={`px-2 sm:px-3 py-2 rounded-full font-semibold transition-colors text-sm sm:text-base ${
               currentPage === page
                 ? "bg-blue-600 text-white"
                 : "bg-gray-700 text-gray-300 hover:bg-blue-500 hover:text-white"
@@ -184,7 +184,7 @@ const MovieCard = ({ searchQuery = "", selectedGenre = null }) => {
         ))}
         <button
           onClick={handleNextPage}
-          className="px-4 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700"
+          className="px-3 sm:px-4 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 text-sm sm:text-base"
         >
           Next
         </button>

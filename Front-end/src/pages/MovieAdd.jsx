@@ -164,13 +164,13 @@ const MoviesAdd = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-blue-950 flex flex-col">
       <Navbar searchQuery={""} setSearchQuery={() => {}} />
-      <main className="flex-1 p-6 mt-20">
+      <main className="flex-1 p-2 xs:p-4 sm:p-6 mt-20">
         {error && (
           <div className="mb-4 p-4 bg-red-500/10 border border-red-500 rounded-lg text-red-500 text-center">
             {error}
           </div>
         )}
-        <div className="flex flex-row flex-wrap gap-6">
+        <div className="flex flex-wrap gap-4 sm:gap-6 justify-center">
           {loading ? (
             <div className="w-full flex justify-center items-center h-72">
               <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
@@ -180,35 +180,35 @@ const MoviesAdd = () => {
               {movies.map((movie) => (
                 <div
                   key={movie._id}
-                  className="relative group w-48 cursor-pointer"
+                  className="relative group w-36 xs:w-44 sm:w-48 cursor-pointer"
                   onClick={() => navigate(`/movie/${movie._id}`)}
                 >
                   <img
                     src={movie.imageUrl}
                     alt={movie.title}
-                    className="w-48 h-72 object-cover rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                    className="w-36 xs:w-44 sm:w-48 h-56 xs:h-64 sm:h-72 object-cover rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
                     onError={(e) => {
                       e.target.src = "/api/placeholder/192/288";
                       e.target.onerror = null;
                     }}
                   />
-                  <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex flex-col justify-between p-4">
+                  <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex flex-col justify-between p-2 xs:p-3 sm:p-4">
                     <div>
-                      <h3 className="text-white font-semibold text-lg mb-2">
+                      <h3 className="text-white font-semibold text-base xs:text-lg mb-1 xs:mb-2">
                         {movie.title}
                       </h3>
-                      <p className="text-gray-300 text-sm line-clamp-4">
+                      <p className="text-gray-300 text-xs xs:text-sm line-clamp-4">
                         {movie.overview}
                       </p>
                     </div>
                     <div className="flex justify-between items-center mt-auto">
                       <div className="flex items-center gap-2">
                         <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                        <span className="text-yellow-400 font-semibold">
+                        <span className="text-yellow-400 font-semibold text-xs xs:text-sm">
                           {movie.rating}
                         </span>
                       </div>
-                      <p className="text-gray-300 text-sm">
+                      <p className="text-gray-300 text-xs xs:text-sm">
                         {movie.published_year}
                       </p>
                     </div>
@@ -221,7 +221,7 @@ const MoviesAdd = () => {
                     className="absolute top-2 right-2 p-1 rounded-full bg-black/60 hover:bg-black/80 transition-colors"
                   >
                     <Heart
-                      className={`w-6 h-6 ${
+                      className={`w-5 xs:w-6 h-5 xs:h-6 ${
                         movie.favorite
                           ? "text-red-500 fill-red-500"
                           : "text-gray-400"
@@ -233,7 +233,7 @@ const MoviesAdd = () => {
 
               <div
                 onClick={() => setShowForm(true)}
-                className="w-48 h-72 flex items-center justify-center border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:border-gray-400 transition-colors group"
+                className="w-36 xs:w-44 sm:w-48 h-56 xs:h-64 sm:h-72 flex items-center justify-center border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:border-gray-400 transition-colors group"
               >
                 <Plus className="w-8 h-8 text-gray-400 group-hover:text-gray-300 transition-colors" />
               </div>
@@ -243,7 +243,7 @@ const MoviesAdd = () => {
 
         {showForm && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-gray-800 p-6 rounded-lg w-full max-w-md relative">
+            <div className="bg-gray-800 p-3 xs:p-4 sm:p-6 rounded-lg w-full max-w-xs xs:max-w-sm sm:max-w-md relative">
               <button
                 onClick={() => setShowForm(false)}
                 className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
@@ -251,13 +251,13 @@ const MoviesAdd = () => {
                 <X className="w-5 h-5" />
               </button>
 
-              <h2 className="text-xl font-semibold text-white mb-4">
+              <h2 className="text-lg xs:text-xl font-semibold text-white mb-4">
                 Add New Movie
               </h2>
 
               <form onSubmit={handleSubmit}>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
+                  <label className="block text-xs xs:text-sm font-medium text-gray-300 mb-1">
                     Title
                   </label>
                   <input
@@ -267,12 +267,12 @@ const MoviesAdd = () => {
                     value={newMovie.title}
                     onChange={handleChange}
                     required
-                    className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
+                    className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors text-xs xs:text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
+                  <label className="block text-xs xs:text-sm font-medium text-gray-300 mb-1">
                     Overview
                   </label>
                   <textarea
@@ -281,12 +281,12 @@ const MoviesAdd = () => {
                     value={newMovie.overview}
                     onChange={handleChange}
                     required
-                    className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors h-24 resize-none"
+                    className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors h-20 xs:h-24 resize-none text-xs xs:text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
+                  <label className="block text-xs xs:text-sm font-medium text-gray-300 mb-1">
                     Image URL
                   </label>
                   <input
@@ -296,12 +296,12 @@ const MoviesAdd = () => {
                     value={newMovie.imageUrl}
                     onChange={handleChange}
                     required
-                    className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
+                    className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors text-xs xs:text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
+                  <label className="block text-xs xs:text-sm font-medium text-gray-300 mb-1">
                     Rating (1-10)
                   </label>
                   <input
@@ -314,12 +314,12 @@ const MoviesAdd = () => {
                     min="1"
                     max="10"
                     step="0.1"
-                    className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
+                    className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors text-xs xs:text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
+                  <label className="block text-xs xs:text-sm font-medium text-gray-300 mb-1">
                     Published Year
                   </label>
                   <input
@@ -331,12 +331,12 @@ const MoviesAdd = () => {
                     required
                     min="1900"
                     max={new Date().getFullYear()}
-                    className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
+                    className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors text-xs xs:text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
+                  <label className="block text-xs xs:text-sm font-medium text-gray-300 mb-1">
                     YouTube Trailer URL
                   </label>
                   <input
@@ -346,7 +346,7 @@ const MoviesAdd = () => {
                     value={newMovie.trailerUrl}
                     onChange={handleChange}
                     required
-                    className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
+                    className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors text-xs xs:text-sm"
                   />
                 </div>
 
@@ -355,14 +355,14 @@ const MoviesAdd = () => {
                     type="button"
                     onClick={() => setShowForm(false)}
                     disabled={submitting}
-                    className="px-4 py-2 rounded bg-gray-600 text-white hover:bg-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3 xs:px-4 py-2 rounded bg-gray-600 text-white hover:bg-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs xs:text-sm"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                    className="px-3 xs:px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center text-xs xs:text-sm"
                   >
                     {submitting ? (
                       <>

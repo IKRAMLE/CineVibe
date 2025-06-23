@@ -29,8 +29,11 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-10 md:gap-4 relative z-10">
         {/* Logo and tagline */}
         <div className="flex flex-col items-center md:items-start gap-3 col-span-1">
-          <img src={logo} alt="CineVibe Logo" className="w-40 h-25 mb-2 drop-shadow-lg -mt-10" />
-          <span className="text-gray-300 text-base italic -mt-10">Feel the magic of movies</span>
+        <div className="w-32 md:w-40 h-12 flex items-center justify-center -ml-10 ">
+            <img src={logo} alt="CineVibe" className="h-15 -mt-7 " />
+            <p className='text-white text-3xl font-kaushan -mt-5 '>PopCorn</p>
+          </div>
+          <span className="text-gray-300 text-base italic -mt-2">Feel the magic of movies</span>
           <div className="flex space-x-4 mt-2">
             {socialLinks.map((link) => (
               <a
