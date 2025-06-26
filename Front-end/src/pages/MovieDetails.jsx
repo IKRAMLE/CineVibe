@@ -10,17 +10,18 @@ const TMDB_API_URL = 'https://api.themoviedb.org/3';
 
 // Separate MovieImage component
 const MovieImage = ({ movie, isLocalMovie }) => {
-  const baseUrl = 'http://localhost:5000/movies';
+  const baseUrl = 'http://localhost:5000';
   const tmdbBaseUrl = 'https://image.tmdb.org/t/p/w500';
   
   const handleImageError = (e) => {
-    e.target.src = `${baseUrl}/default-poster.jpg`;
+    e.target.src = `${baseUrl}/uploads/default-poster.jpg`;
     e.target.onerror = null;
   };
 
   const getImageSrc = () => {
     if (isLocalMovie) {
-      return `${baseUrl}${movie.poster_path}`;
+      // For local movies, use the imagePath from the backend uploads directory
+      return `${baseUrl}/uploads/${movie.imagePath}`;
     }
     return `${tmdbBaseUrl}${movie.poster_path}`;
   };
@@ -30,6 +31,7 @@ const MovieImage = ({ movie, isLocalMovie }) => {
       src={getImageSrc()}
       alt={movie.title}
       onError={handleImageError}
+      className="w-full h-auto rounded-lg shadow-lg"
     />
   );
 };
