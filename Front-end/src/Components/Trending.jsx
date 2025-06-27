@@ -50,14 +50,14 @@ const MovieCard = () => {
     localStorage.setItem('favoriteMovies', JSON.stringify(updatedFavorites));
   };
 
-  // Auto-scroll every 20 seconds
+  // Auto-scroll every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       if (containerRef.current) {
         const isMobile = window.innerWidth < 640;
         containerRef.current.scrollBy({ left: isMobile ? 180 : 400, behavior: "smooth" });
       }
-    }, 10); 
+    }, 5000); 
     return () => clearInterval(interval);
   }, []);
 
