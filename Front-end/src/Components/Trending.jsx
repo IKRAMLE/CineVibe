@@ -72,7 +72,7 @@ const MovieCard = () => {
 
   return (
     <div className="py-4 sm:py-6 px-1 sm:px-6 relative bg-gray-900 ">
-      <div className="flex justify-between items-center -mt-6 sm:-mt-10 md:-mt-45">
+      <div className="flex justify-between items-center -mt-50 sm:-mt-10 md:-mt-45">
         <h3 className="text-lg sm:text-2xl font-semibold text-white mb-3 sm:mb-5">Trending Movies</h3>
       </div>
 
