@@ -28,13 +28,8 @@ const AddingForm = ({ showForm, setShowForm, onSubmit, submitting }) => {
     }
 
     if (name === "published_year") {
-      const yearValue = parseInt(value);
-      if (
-        value === "" ||
-        (!isNaN(yearValue) &&
-          yearValue >= 1900 &&
-          yearValue <= new Date().getFullYear())
-      ) {
+      // Allow empty value or numeric input
+      if (value === "" || /^\d{0,4}$/.test(value)) {
         setNewMovie({ ...newMovie, [name]: value });
       }
       return;
@@ -216,14 +211,12 @@ const AddingForm = ({ showForm, setShowForm, onSubmit, submitting }) => {
                 Published Year
               </label>
               <input
-                type="number"
+                type="text"
                 name="published_year"
                 placeholder="Year"
                 value={newMovie.published_year}
                 onChange={handleChange}
                 required
-                min="1900"
-                max={new Date().getFullYear()}
                 className="w-full p-2 rounded-lg bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none transition-colors text-xs xs:text-sm shadow-sm"
               />
             </div>

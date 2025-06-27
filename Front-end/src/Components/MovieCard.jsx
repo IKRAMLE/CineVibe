@@ -132,25 +132,17 @@ const MovieCard = ({ searchQuery = "", selectedGenre = null }) => {
                 alt={movie.title}
                 className="w-full h-48 xs:h-56 sm:h-64 md:h-72 object-cover rounded-lg shadow-md hover:shadow-xl transition-all duration-300"
               />
-              <div className="hidden xs:flex absolute inset-0 bg-black/80 rounded-lg p-2 sm:p-4 opacity-0 group-hover:opacity-100 transition-opacity flex-col justify-between pointer-events-none">
+              <div className="hidden sm:flex absolute inset-0 bg-black/80 rounded-lg p-4 opacity-0 group-hover:opacity-100 transition-opacity flex-col justify-between pointer-events-none">
                 <div>
-                  <h4 className="text-white font-semibold text-base sm:text-lg mb-1 sm:mb-2">
-                    {movie.title}
-                  </h4>
-                  <p className="text-white text-xs sm:text-sm line-clamp-4">
-                    {movie.overview}
-                  </p>
+                  <h4 className="text-white font-semibold text-base mb-2">{movie.title}</h4>
+                  <p className="text-white text-xs line-clamp-4">{movie.overview}</p>
                 </div>
-                <div className="flex items-center justify-between mt-2">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-1">
                     <Star className="text-yellow-400" size={16} />
-                    <span className="text-white text-xs sm:text-base">
-                      {movie.vote_average?.toFixed(1) ?? "-"}
-                    </span>
+                    <span className="text-white">{movie.vote_average?.toFixed(1)}</span>
                   </div>
-                  <span className="text-white text-xs sm:text-sm">
-                    {movie.release_date?.split("-")[0]}
-                  </span>
+                  <span className="text-white text-xs">{movie.release_date?.split("-")[0]}</span>
                 </div>
               </div>
             </div>
